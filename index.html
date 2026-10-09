@@ -4,6 +4,7 @@
 <noscript>Please enable JavaScript to play.</noscript><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Survive the Wasteland</title>
+  <link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#050605;overflow:hidden;font-family:system-ui,sans-serif;color:#e8e2d0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -52,6 +53,11 @@ sub{position:absolute;right:4px;bottom:2px;font-size:11px}
 #fl{position:fixed;inset:0;background:#e00;opacity:0;pointer-events:none;z-index:2}
 #dead{display:none;position:fixed;inset:0;z-index:30;background:rgba(30,0,0,.85);flex-direction:column;align-items:center;justify-content:center;gap:10px}
 </style></head><body>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
+  </script>
 <div id="rot">Tip: rotate your phone to landscape for the best layout</div>
 <div id="touch"></div><div id="dn"></div><div id="nm"></div><div id="fl"></div><div id="knob"></div>
 <div id="stats" class="z"><div id="lv"></div></div>
