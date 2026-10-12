@@ -1,736 +1,738 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BEATNEST — your music, offline-ready</title>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#F3F1FA;--surface:#FFFFFF;--surface2:#E9E6F7;--ink:#15132B;--muted:#5F5C84;--line:#DAD6EE;
-  --accent:#3560F0;--accent-ink:#FFFFFF;--shadow:0 10px 30px rgba(21,19,43,.14);
-  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
-  --body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--bg:#0F0D1F;--surface:#1A1733;--surface2:#262247;--ink:#F1EFFF;--muted:#A19DCB;--line:#2E2A55;--shadow:0 10px 30px rgba(0,0,0,.45)}
-}
-:root[data-theme="dark"]{--bg:#0F0D1F;--surface:#1A1733;--surface2:#262247;--ink:#F1EFFF;--muted:#A19DCB;--line:#2E2A55;--shadow:0 10px 30px rgba(0,0,0,.45)}
-:root[data-accent="green"]{--accent:#0B8F61}
-:root[data-accent="violet"]{--accent:#7A3DF0}
-html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
-body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
-*,*::before,*::after{box-sizing:border-box}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-button:focus-visible,input:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
-h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em}
-small{color:var(--muted)}
-[hidden]{display:none!important}
-svg.i{width:22px;height:22px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex:none}
-svg.i.f{fill:currentColor}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>NEON FRONTIER — Mobile Survival</title>
+  <style>
+    :root {
+      --ui-bg: rgba(12, 17, 20, 0.78);
+      --ui-border: rgba(255, 255, 255, 0.18);
+      --red: #e63946;
+      --orange: #f4a261;
+      --blue: #2a9d8f;
+      --gold: #e9c46a;
+    }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, system-ui, sans-serif; }
+    canvas#world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
 
-#app{height:100%;max-width:560px;margin:0 auto;position:relative;display:flex;flex-direction:column;overflow:hidden}
-main{flex:1;overflow-y:auto;padding:18px 18px 200px;-webkit-overflow-scrolling:touch}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.brand .mark{width:36px;height:36px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
-.brand h1{font-size:24px;font-weight:800}
-.sec{margin:26px 0 10px;display:flex;align-items:baseline;justify-content:space-between}
-.sec h2{font-size:19px;font-weight:600}
-.link{color:var(--accent);font-weight:700;padding:6px 4px}
+    /* Start / Rotate Screen */
+    #start-screen {
+      position: fixed; inset: 0; z-index: 99; background: radial-gradient(circle, #1a2634 0%, #080d12 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center;
+      padding: 20px;
+    }
+    #start-screen h1 { font-size: 38px; letter-spacing: 2px; margin-bottom: 6px; }
+    #start-screen p { font-size: 13px; color: #a0aec0; margin-bottom: 24px; }
+    #btn-start {
+      background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; border: none;
+      padding: 14px 34px; font-size: 16px; font-weight: bold; border-radius: 30px;
+      box-shadow: 0 4px 18px rgba(230, 126, 34, 0.5); cursor: pointer; text-transform: uppercase;
+    }
 
-/* the one bold element: the record */
-.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:8px 0 4px}
-.hero h2{font-size:clamp(28px,8vw,38px);font-weight:800;line-height:1.05;max-width:14ch}
-.hero p{margin:0;color:var(--muted);max-width:34ch}
-.disc{position:relative;width:min(66vw,250px);aspect-ratio:1;border-radius:50%;margin:6px auto;display:grid;place-items:center;
-  background:repeating-radial-gradient(circle at 50% 50%,#1d1a38 0 2px,#0f0d20 2px 5px);box-shadow:var(--shadow)}
-.disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,#fff0 0 38%,#ffffff26 48%,#fff0 58% 88%,#ffffff1c 98%,#fff0)}
-.disc::after{content:"";position:absolute;width:5%;aspect-ratio:1;border-radius:50%;background:var(--bg)}
-.disc .lbl{width:38%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 clamp(22px,7vw,32px) var(--display)}
-body.playing .disc{animation:spin 7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+    /* UI Layout */
+    .game-logo {
+      position: absolute; top: 12px; left: 16px; z-index: 5; pointer-events: none;
+    }
+    .game-logo h1 { font-size: 20px; color: #f0f3f4; letter-spacing: 1px; font-weight: 800; }
+    .game-logo p { font-size: 8px; color: #cbd5e0; letter-spacing: 2px; }
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;font-weight:700}
-.btn.primary{background:var(--accent);color:var(--accent-ink)}
-.btn.ghost{background:var(--surface2)}
-.btn.danger{background:#C8372D;color:#fff}
-a.btn{text-decoration:none;color:inherit}
-a.btn.primary{color:var(--accent-ink)}
-.vip{display:flex;align-items:center;gap:12px;width:100%;margin:22px 0 0;padding:14px 16px;border-radius:20px;text-align:left;color:#fff;background:var(--accent);background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#000))}
-.vip small{color:#ffffffd9}
-.vip .link{color:#fff;font-weight:800}
-.crown{width:40px;height:40px;border-radius:12px;background:#ffffff2e;display:grid;place-items:center;flex:none}
-.btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    /* Top Right Vitals */
+    .status-hud {
+      position: absolute; top: 10px; right: 16px; z-index: 5;
+      background: var(--ui-bg); border: 1px solid var(--ui-border);
+      border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 5px; min-width: 130px;
+    }
+    .stat-row { display: flex; align-items: center; gap: 8px; }
+    .stat-icon { font-size: 11px; width: 14px; }
+    .stat-bar { flex: 1; height: 7px; background: rgba(0,0,0,0.6); border-radius: 4px; overflow: hidden; }
+    .stat-fill { height: 100%; border-radius: 4px; }
+    .stat-hp { background: #e74c3c; }
+    .stat-food { background: #e67e22; }
+    .stat-water { background: #3498db; }
 
-.row{display:flex;align-items:center;gap:4px;border-radius:16px}
-.row.on{background:var(--surface2)}
-.rowmain{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px;text-align:left;border-radius:16px}
-.cov{width:48px;height:48px;border-radius:14px;flex:none;display:grid;place-items:center;color:#fff;font:800 20px var(--display)}
-.meta{display:flex;flex-direction:column;min-width:0;flex:1}
-.meta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
-.meta small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--muted);flex:none}
-.ib[aria-pressed="true"]{color:var(--accent)}
-.eq{display:flex;gap:2px;align-items:flex-end;height:16px;margin-right:4px}
-.eq i{width:3px;background:var(--accent);height:100%;animation:eq .9s ease-in-out infinite;transform-origin:bottom}
-.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}
-@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
-.empty{text-align:center;padding:30px 16px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
-.empty b{color:var(--ink);font:600 18px var(--display)}
-.shelf{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
-.card{width:128px;flex:none;text-align:left}
-.card .cov{width:128px;height:128px;border-radius:20px;font-size:40px;margin-bottom:8px}
-.card b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* Hotbar */
+    .hotbar {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 5; background: var(--ui-bg);
+      padding: 4px 8px; border-radius: 8px; border: 1px solid var(--ui-border);
+    }
+    .slot {
+      width: 42px; height: 42px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .slot.active { border-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+    .slot span { font-size: 18px; }
+    .slot b { position: absolute; bottom: 2px; right: 3px; font-size: 8px; color: #fff; }
 
-.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:0 16px;min-height:48px}
-.search input{flex:1;min-width:0;background:none;border:0;color:var(--ink);font:inherit;min-height:46px}
-.search input:focus-visible{outline:none}
-.search:focus-within{outline:3px solid var(--accent)}
-.seg{display:flex;gap:6px;background:var(--surface2);padding:4px;border-radius:999px;margin:4px 0 14px}
-.seg button{flex:1;min-height:40px;border-radius:999px;font-weight:700;color:var(--muted)}
-.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+    /* Touch Controls */
+    #touch-layer { position: fixed; inset: 0; z-index: 4; display: none; }
+    #look-pad { position: absolute; right: 0; top: 0; width: 55%; height: 100%; touch-action: none; }
+    
+    #joy-base {
+      position: absolute; bottom: 20px; left: 24px; width: 100px; height: 100px;
+      border-radius: 50%; border: 2px solid rgba(255,255,255,0.25);
+      background: radial-gradient(circle, rgba(255,255,255,0.08), rgba(0,0,0,0.4));
+      touch-action: none;
+    }
+    #joy-stick {
+      position: absolute; left: 50%; top: 50%; width: 40px; height: 40px;
+      border-radius: 50%; background: rgba(255,255,255,0.45); border: 1px solid #fff;
+      transform: translate(-50%, -50%); pointer-events: none;
+    }
 
-.panelrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
-.opts{display:flex;gap:6px;flex-wrap:wrap}
-.opt{min-height:40px;padding:0 14px;border-radius:999px;background:var(--surface2);font-weight:500}
-.opt[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 4px}
-.stat{background:var(--surface);border-radius:18px;padding:14px;text-align:center}
-.stat b{display:block;font:800 26px var(--display)}
+    .action-pad {
+      position: absolute; bottom: 16px; right: 18px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .action-btn {
+      width: 46px; height: 46px; border-radius: 50%; background: var(--ui-bg);
+      border: 1.5px solid var(--ui-border); color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; touch-action: manipulation;
+    }
+    .action-btn:active { background: rgba(230,126,34,0.6); transform: scale(0.94); }
 
-#mini{position:absolute;left:10px;right:10px;bottom:72px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;z-index:5}
-#mini .inner{display:flex;align-items:center;gap:4px;padding:6px 6px 8px 6px}
-#mini .rowmain{padding:4px 6px}
-#mini .cov{width:42px;height:42px;border-radius:12px;font-size:17px}
-#mini .bar{height:3px;background:var(--surface2)}
-#mini .bar i{display:block;height:100%;width:0;background:var(--accent)}
-.play{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
-nav{position:absolute;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);z-index:6}
-nav button{flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;font-weight:500}
-nav button[aria-current="page"]{color:var(--accent);font-weight:700}
-
-#np{position:absolute;inset:0;background:var(--bg);z-index:20;overflow-y:auto;padding:14px 22px 30px;transform:translateY(100%);visibility:hidden;transition:transform .28s ease,visibility 0s .28s}
-#np.open{transform:none;visibility:visible;transition:transform .28s ease}
-.nptop{display:flex;align-items:center;justify-content:space-between;font-weight:700}
-.npmeta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 6px}
-.npmeta h2{font-size:26px;font-weight:800;line-height:1.1}
-input[type=range]{width:100%;accent-color:var(--accent);height:32px;margin:0}
-.times{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
-.ctrls{display:flex;align-items:center;justify-content:space-between;margin:10px 0}
-.ctrls .play{width:68px;height:68px}
-.ctrls .play svg{width:30px;height:30px}
-.ctrls .ib[aria-pressed="true"]{color:var(--accent)}
-.volrow{display:flex;align-items:center;gap:10px;color:var(--muted)}
-
-#sheet{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;justify-content:flex-end}
-.scrim{position:absolute;inset:0;background:rgba(10,8,25,.55)}
-.panel{position:relative;background:var(--surface);border-radius:26px 26px 0 0;padding:20px 20px 28px;max-height:82%;overflow-y:auto}
-.panel h3{font-size:20px;font-weight:800;margin-bottom:10px}
-.panel p{margin:6px 0 14px;color:var(--muted)}
-.field{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;padding:0 14px;margin-bottom:12px}
-.lrow{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:0 4px;text-align:left;border-bottom:1px solid var(--line)}
-#toast{position:absolute;left:50%;bottom:150px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;z-index:40;max-width:90%;text-align:center}
-#ytbox{position:absolute;z-index:25;display:none;overflow:hidden;background:#000;box-shadow:var(--shadow);right:10px;bottom:140px;width:200px;height:113px;border-radius:14px}
-#ytbox iframe{width:100%;height:100%;border:0;display:block}
-body.ytdock #ytbox{display:block}
-body.ytnp #ytbox{display:block;left:22px;right:22px;top:72px;bottom:auto;width:auto;height:220px;border-radius:18px}
-body.ytnp #np{overflow-y:hidden}
-@media (prefers-reduced-motion:reduce){body.playing .disc,.eq i{animation:none}#np,#np.open{transition:none}}
-</style>
+    .crosshair {
+      position: absolute; left: 50%; top: 50%; width: 5px; height: 5px;
+      background: #fff; border-radius: 50%; transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 3; box-shadow: 0 0 4px #000;
+    }
+    #toast {
+      position: absolute; top: 18%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.85); color: #fff; padding: 6px 14px; border-radius: 5px;
+      border-left: 3px solid var(--gold); font-size: 11px; z-index: 10; opacity: 0; transition: opacity .2s;
+    }
+    #toast.show { opacity: 1; }
+      /* Frontier tech HUD, compact on phones and safe-area aware. */
+    .tech-resources { position: fixed; z-index: 6; top: 112px; right: 16px; display: flex; gap: 5px; }
+    .tech-chip { padding: 5px 7px; border: 1px solid rgba(105,245,232,.25); border-radius: 8px; background: rgba(7,19,26,.82); color: #eaffff; font-size: 9px; font-weight: 800; }
+    .tech-chip small { margin-left: 3px; color: #80b4b6; font-size: 7px; }
+    #btn-build { position: fixed; z-index: 8; top: 151px; right: 16px; padding: 8px 11px; color: #09201f; background: linear-gradient(110deg,#82ffe1,#69cfff); border: 1px solid rgba(205,255,249,.8); border-radius: 9px; font-size: 9px; font-weight: 900; letter-spacing: .1em; box-shadow: 0 0 16px rgba(75,255,229,.18); touch-action: manipulation; }
+    #build-panel { position: fixed; z-index: 20; right: 12px; top: 195px; width: min(340px, calc(100vw - 24px)); padding: 12px; border: 1px solid rgba(105,245,232,.35); border-radius: 13px; color: white; background: rgba(6,18,25,.95); box-shadow: 0 12px 38px rgba(0,0,0,.45); display: none; }
+    #build-panel.show { display: block; }
+    #build-panel h2 { margin: 0 0 4px; color: #9ffff1; font-size: 12px; letter-spacing: .12em; }
+    #build-panel p { margin: 0 0 9px; color: #9ababb; font-size: 9px; }
+    .fab-option { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding: 9px; border: 1px solid rgba(105,245,232,.2); border-radius: 9px; color: #efffff; background: rgba(80,200,190,.08); text-align: left; font-size: 10px; font-weight: 800; touch-action: manipulation; }
+    .fab-option small { color: #9ababb; font-size: 8px; font-weight: 600; }
+    .fab-close { float: right; border: 0; background: transparent; color: #cafff9; font-size: 18px; }
+    @media (max-width: 600px) {
+      .tech-resources { top: 105px; right: 9px; gap: 3px; }
+      .tech-chip { padding: 4px 5px; font-size: 8px; }
+      #btn-build { top: 139px; right: 9px; padding: 7px 9px; }
+      #build-panel { top: auto; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 8px; width: min(310px, calc(100vw - 16px)); }
+      .hotbar { bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+      #joy-base { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js"
+      }
+    }
+  </script>
 </head>
 <body>
-<div id="app">
-  <main id="main">
-    <section id="v-home"></section>
-    <section id="v-search" hidden>
-      <div class="brand"><h1>Search</h1></div>
-      <label class="search"><span aria-hidden="true" id="sic"></span><input id="q" type="search" placeholder="Songs or artists" autocomplete="off" aria-label="Search songs or artists"></label>
-      <div id="sres" style="margin-top:14px"></div>
-    </section>
-    <section id="v-lib" hidden></section>
-    <section id="v-me" hidden></section>
-  </main>
-  <div id="mini" hidden></div>
-  <div id="ytbox"><div id="ytplayer"></div></div>
-  <nav aria-label="Main">
-    <button data-act="tab" data-id="home" aria-current="page"></button>
-    <button data-act="tab" data-id="search"></button>
-    <button data-act="tab" data-id="lib"></button>
-    <button data-act="tab" data-id="me"></button>
-  </nav>
-  <div id="np" role="dialog" aria-modal="true" aria-label="Now playing"></div>
-  <div id="sheet" hidden></div>
-  <div id="toast" role="status" aria-live="polite" hidden></div>
-  <input id="files" type="file" accept="audio/*" multiple hidden>
-</div>
+  <!-- Start Screen to activate Landscape & Fullscreen -->
+  <div id="start-screen">
+    <h1>NEON FRONTIER</h1>
+    <p>BUILD · GROW · SURVIVE</p>
+    <button id="btn-start">START GAME</button>
+  </div>
 
-<script>
-(()=>{
-"use strict";
-/* ---------- config ---------- */
-const CFG={
-  price:29,            // VIP price per month (₹)
-  vipDays:30,          // days of VIP each code gives
-  freePlays:10,        // free plays per day for songs you add (starter mixes are always free)
-  upiId:"himanshu120mishra@gmail.com", // payee UPI ID, copied from your old BEATNEST page: please check it
-  upiName:"BEATNEST",
-  firebase:{ // Firebase web config (safe to be public; real protection is Firestore rules)
-    apiKey:"AIzaSyBfZ5QsR6JQ5RTNX1NiIIVuMJ5GC1m7JgE",
-    authDomain:"exmmusic.firebaseapp.com",
-    projectId:"exmmusic",
-    storageBucket:"exmmusic.firebasestorage.app",
-    messagingSenderId:"346732395794",
-    appId:"1:346732395794:web:8c6840b04ef89cd67347cb",
-    measurementId:"G-XNN3R6CWY8"
-  },
-  ytKey:"AIzaSyBfZ5QsR6JQ5RTNX1NiIIVuMJ5GC1m7JgE", // YouTube Data API key: restrict it to your site in Google Cloud (see notes)
-  supportEmail:"support@beatnest.app",
-  // SHA-256 hash of your VIP code (the code itself is not in this file)
-  vipHashes:["910f6e8e7be8aeb9862fc602768cbcef8fb438592bc96d0be978398474c6d2da"]
-};
-const DEMOS=[
- {id:"demo-1",title:"Night Drive",artist:"BEATNEST Labs",demo:{bpm:92,root:110,scale:[0,3,5,7,10],lead:"saw"}},
- {id:"demo-2",title:"Monsoon Chai",artist:"BEATNEST Labs",demo:{bpm:78,root:98,scale:[0,2,4,7,9],lead:"sine"}},
- {id:"demo-3",title:"Rooftop Sunrise",artist:"BEATNEST Labs",demo:{bpm:118,root:130.8,scale:[0,2,3,7,8],lead:"square"}}
-];
+  <canvas id="world"></canvas>
+  <div class="crosshair"></div>
 
-/* ---------- helpers ---------- */
-const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const P="bn:";
-const store={
-  get(k,d){try{const v=localStorage.getItem(P+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(P+k,JSON.stringify(v))}catch(e){}if(cloudKey(k))cloudSched()},
-  wipe(){try{Object.keys(localStorage).filter(k=>k.startsWith(P)).forEach(k=>localStorage.removeItem(k))}catch(e){}}
-};
-const fmt=s=>{if(!isFinite(s))return"0:00";s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
-const IC={
- play:'<polygon points="6 3 20 12 6 21 6 3"/>',
- pause:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
- next:'<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>',
- prev:'<polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>',
- shuffle:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>',
- repeat:'<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
- repeat1:'<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/>',
- heart:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
- search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
- home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
- lib:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
- user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
- moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
- plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
- more:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
- down:'<polyline points="6 9 12 15 18 9"/>',
- vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
- crown:'<path d="M2 20h20"/><path d="M4 17L3 7l5 4 4-7 4 7 5-4-1 10z"/>'
-};
-const FILLED=new Set(["play","pause","next","prev"]);
-const ic=(n,f)=>`<svg class="i${f||FILLED.has(n)?" f":""}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
-const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
-const covStyle=t=>{const h=hue(t.title);return`background:linear-gradient(135deg,hsl(${h} 72% 52%),hsl(${(h+55)%360} 70% 32%))`};
-const cov=t=>`<div class="cov" style="${covStyle(t)}" aria-hidden="true">${esc((t.title||"?").trim().charAt(0).toUpperCase())}</div>`;
+  <div class="game-logo">
+    <h1>NEON FRONTIER</h1>
+    <p>OUTPOST 07 · SURVIVE</p>
+  </div>
 
-/* ---------- storage (IndexedDB for local songs) ---------- */
-let db=null;
-const openDB=()=>new Promise(res=>{try{const r=indexedDB.open("beatnest",1);r.onupgradeneeded=()=>r.result.createObjectStore("tracks",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});
-const tx=(mode,fn)=>new Promise(res=>{if(!db)return res(null);try{const t=db.transaction("tracks",mode),q=fn(t.objectStore("tracks"));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>res(null);t.onabort=()=>res(null)}catch(e){res(null)}});
+  <div class="status-hud">
+    <div class="stat-row"><span class="stat-icon">❤️</span><div class="stat-bar"><div class="stat-fill stat-hp" id="bar-hp" style="width:100%"></div></div></div>
+    <div class="stat-row"><span class="stat-icon">🍖</span><div class="stat-bar"><div class="stat-fill stat-food" id="bar-food" style="width:85%"></div></div></div>
+    <div class="stat-row"><span class="stat-icon">💧</span><div class="stat-bar"><div class="stat-fill stat-water" id="bar-water" style="width:80%"></div></div></div>
+  </div>
 
-/* ---------- demo synth: tiny browser-made songs so the app is never empty ---------- */
-function synth(d){
-  const sr=22050,secs=28,n=sr*secs,pcm=new Int16Array(n),beat=60/d.bpm,sc=d.scale,TAU=Math.PI*2;
-  const osc=(ph,w)=>{const p=ph-Math.floor(ph);return w==="saw"?2*p-1:w==="square"?(p<.5?.5:-.5):Math.sin(TAU*p)};
-  for(let i=0;i<n;i++){
-    const t=i/sr,bt=t/beat,b=Math.floor(bt),f=bt-b,e8=Math.floor(bt*2),ef=bt*2-e8;
-    const note=sc[(e8*3+(e8>>3))%sc.length]+(e8%8>=4?12:0);
-    const lead=osc(t*d.root*2*Math.pow(2,note/12),d.lead)*Math.exp(-ef*3.2)*Math.min(1,ef*60)*.2;
-    const bf=d.root/2*Math.pow(2,sc[(b>>2)%sc.length]/12);
-    const bass=Math.sin(TAU*t*bf)*.32*Math.min(1,f*40)*(.65+.35*Math.exp(-f*3));
-    const kt=f*beat,kick=Math.sin(TAU*(50*kt+6*(1-Math.exp(-kt*40))))*Math.exp(-kt*16)*.5;
-    const hat=(e8%2===1)?(Math.random()*2-1)*Math.exp(-ef*beat*70)*.07:0;
-    const g=Math.min(1,t/.05,(secs-t)/.4);
-    pcm[i]=Math.max(-1,Math.min(1,(lead+bass+kick+hat)*g))*30000;
-  }
-  const buf=new ArrayBuffer(44+n*2),v=new DataView(buf),w=(o,s)=>{for(let k=0;k<s.length;k++)v.setUint8(o+k,s.charCodeAt(k))};
-  w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
-  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);
-  new Int16Array(buf,44).set(pcm);
-  return new Blob([buf],{type:"audio/wav"});
-}
+  <div class="tech-resources" aria-label="Outpost materials">
+    <div class="tech-chip">🪵 <span id="tech-wood">10</span><span id="txt-wood" hidden>10</span><small>WOOD</small></div>
+    <div class="tech-chip">⬡ <span id="tech-scrap">8</span><small>TECH</small></div>
+    <div class="tech-chip">🌱 <span id="tech-seeds">4</span><small>SEEDS</small></div>
+  </div>
+  <button id="btn-build" aria-expanded="false">＋ FABRICATOR</button>
+  <section id="build-panel" aria-hidden="true">
+    <button class="fab-close" id="fab-close" aria-label="Close">×</button>
+    <h2>OUTPOST FABRICATOR</h2><p>Build a smarter frontier. Modules deploy just ahead of you.</p>
+    <button class="fab-option" data-build="relay"><span>📡 SOLAR RELAY<br><small>Extend the clean power grid</small></span><b>2 🪵 · 4 ⬡</b></button>
+    <button class="fab-option" data-build="purifier"><span>💧 WATER RECYCLER<br><small>Restore hydration at the unit</small></span><b>3 🪵 · 5 ⬡</b></button>
+    <button class="fab-option" data-build="farm"><span>🪴 HYDROPONIC BAY<br><small>Eight new smart grow beds</small></span><b>6 🪵 · 4 ⬡</b></button>
+  </section>
+  <div class="hotbar">
+    <div class="slot active" data-tool="axe"><span>🪓</span></div>
+    <div class="slot" data-tool="torch"><span>🔥</span></div>
+    <div class="slot" data-tool="seeds"><span>🌱</span><b id="txt-seeds">4</b></div>
+    <div class="slot" data-tool="food"><span>🥩</span><b id="txt-food">3</b></div>
+  </div>
 
-/* ---------- state ---------- */
-let userTracks=[];
-let ytSaved=store.get("yts",{}),ytMap=Object.assign({},ytSaved),ytState={q:"",ids:[],loading:false},ytCache={};
-let favs=store.get("favs",[]),recents=store.get("recents",[]),lists=store.get("lists",[]),played=store.get("played",0);
-let shuffle=store.get("shuffle",false),repeat=store.get("repeat",0),vol=store.get("vol",1);
-let tab="home",libSeg="songs",openList=null,queue=[],cur=null,sleepTimer=null,sleepAt=0,seeking=false;
-const demoUrl={};let userUrl=null;
-const all=()=>DEMOS.concat(userTracks);
-const byId=id=>all().find(t=>t.id===id)||ytMap[id];
-const A=new Audio();A.preload="metadata";A.volume=vol;
+  <div id="touch-layer">
+    <div id="look-pad"></div>
+    <div id="joy-base"><div id="joy-stick"></div></div>
+    <div class="action-pad">
+      <button class="action-btn" id="btn-act">⚔️</button>
+      <button class="action-btn" id="btn-use">🖐️</button>
+      <button class="action-btn" id="btn-jump">⬆️</button>
+    </div>
+  </div>
 
-/* ---------- VIP membership ---------- */
-let vip=store.get("vip",0),usedCodes=store.get("used",[]),dayPlays=store.get("day",{d:"",n:0});
-const today=()=>new Date().toISOString().slice(0,10);
-let cloudVip=0;
-const vipEnd=()=>Math.max(vip,cloudVip);
-const isVip=()=>vipEnd()>Date.now();
-const vipLeft=()=>Math.max(1,Math.ceil((vipEnd()-Date.now())/864e5));
-const freeLeft=()=>Math.max(0,CFG.freePlays-(dayPlays.d===today()?dayPlays.n:0));
-async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
-function vipCard(){
-  const v=isVip();
-  return`<button class="vip" data-act="vip" aria-label="Open membership"><span class="crown">${ic("crown")}</span><span class="meta"><b>${v?"VIP is active":"Go VIP for ₹"+CFG.price+" a month"}</b><small>${v?vipLeft()+" days left":freeLeft()+" of "+CFG.freePlays+" free plays left today"}</small></span><span class="link">${v?"Details":"Unlock"}</span></button>`;
-}
-function memRow(){
-  const v=isVip();
-  return`<div class="panelrow"><span>Membership<br><small>${v?"VIP active, "+vipLeft()+" days left":freeLeft()+" free plays left today"}</small></span><button class="btn primary" data-act="vip">${ic("crown")} ${v?"Details":"Go VIP"}</button></div>`;
-}
-function vipSheet(blocked){
-  const v=isVip();
-  let h=`<h3>${blocked?"Today's free plays are used up":v?"You're a VIP":"BEATNEST VIP"}</h3>`;
-  h+=`<p>${blocked?`The free plan has ${CFG.freePlays} plays a day. Go VIP to keep listening now, or come back tomorrow.`:v?`Your membership is active for ${vipLeft()} more days.`:`₹${CFG.price} a month. Unlimited plays, no daily limit.`}</p>`;
-  h+=accountHint();
-  if(CFG.upiId)h+=`<div class="panelrow"><span><b>1. Pay ₹${CFG.price}</b><br><small>Use any UPI app</small></span><a class="btn primary" href="upi://pay?pa=${encodeURIComponent(CFG.upiId)}&amp;pn=${encodeURIComponent(CFG.upiName)}&amp;am=${CFG.price}&amp;cu=INR&amp;tn=BEATNEST%20VIP">Pay with UPI</a></div><div class="panelrow"><span>UPI ID<br><small>${esc(CFG.upiId)}</small></span><button class="btn ghost" data-act="copyupi">Copy</button></div>`;
-  h+=`<div class="panelrow"><span><b>2. Send your payment screenshot</b><br><small>You get a VIP code in reply</small></span><a class="btn ghost" href="mailto:${CFG.supportEmail}?subject=BEATNEST%20VIP%20payment">Email it</a></div>`;
-  h+=`<p style="margin-top:14px"><b style="color:var(--ink)">3. Enter your VIP code</b></p><input class="field" id="vipcode" placeholder="BN-XXXX-XXXX" autocomplete="off" autocapitalize="characters" aria-label="VIP code"><div class="btns"><button class="btn ghost" data-act="close">Not now</button><button class="btn primary" data-act="activate">Activate VIP</button></div>`;
-  sheet(h);
-}
-async function activate(code){
-  try{
-    const h=await sha("beatnest:"+code);
-    if(!CFG.vipHashes.includes(h)){toast("That code isn't valid. Check it and try again.");return}
-    usedCodes.push(h);store.set("used",usedCodes);
-    vip=Math.max(Date.now(),vip)+CFG.vipDays*864e5;store.set("vip",vip);
-    closeSheet();track("vip_unlock",{method:"code"});toast("VIP is on. Enjoy unlimited music!");render();
-  }catch(e){toast("This browser can't check codes. Try Chrome or Safari.")}
-}
+  <div id="toast"></div>
 
-async function urlFor(t){
-  if(t.demo){return demoUrl[t.id]||(demoUrl[t.id]=URL.createObjectURL(synth(t.demo)))}
-  if(userUrl)URL.revokeObjectURL(userUrl);
-  userUrl=URL.createObjectURL(t.blob);return userUrl;
-}
-function listFor(ctx){
-  if(ctx==="fav")return favs.filter(byId);
-  if(ctx==="recent")return recents.filter(byId);
-  if(ctx.startsWith("pl:")){const l=lists.find(x=>x.id===ctx.slice(3));return l?l.ids.filter(byId):[]}
-  if(ctx==="yt")return ytState.ids.filter(byId);
-  if(ctx==="search")return searchHits().map(t=>t.id);
-  return all().map(t=>t.id);
-}
-async function playTrack(id,ctx){
-  const t=byId(id);if(!t)return;
-  if(!t.demo&&!t.yt&&!isVip()&&freeLeft()<=0){vipSheet(true);return}
-  if(ctx&&ctx!=="queue")queue=listFor(ctx);
-  if(!queue.includes(id))queue=[id];
-  cur=t;
-  try{
-    if(t.yt){A.pause();A.removeAttribute("src");saveYT(t.id);setNP(true);await loadYT(t.yt)}
-    else{if(ytp&&ytReady){try{ytp.pauseVideo()}catch(e){}}A.src=await urlFor(t);await A.play();syncYT()}
-  }
-  catch(e){toast("This file won't play. Try another MP3.");render();return}
-  recents=[id].concat(recents.filter(x=>x!==id)).slice(0,20);store.set("recents",recents);
-  played++;store.set("played",played);
-  track("play_track",{source:t.yt?"youtube":t.demo?"starter":"local"});
-  if(!t.demo&&!t.yt&&!isVip()){dayPlays={d:today(),n:(dayPlays.d===today()?dayPlays.n:0)+1};store.set("day",dayPlays)}
-  meta();render();
-}
-function step(dir,auto){
-  if(!cur)return;
-  const i=queue.indexOf(cur.id);
-  if(auto&&repeat===2){seekTo(0);doPlay();return}
-  if(shuffle&&queue.length>1){let n;do{n=queue[Math.floor(Math.random()*queue.length)]}while(n===cur.id);return playTrack(n)}
-  if(dir<0){if(curTime()>3){seekTo(0);return}return playTrack(queue[(i-1+queue.length)%queue.length])}
-  const n=i+1;
-  if(n>=queue.length){if(repeat===1||!auto)return playTrack(queue[0]);doPause();seekTo(0);return}
-  playTrack(queue[n]);
-}
-const toggle=()=>{if(!cur){const f=all()[0];return f&&playTrack(f.id,"lib")}isPaused()?doPlay():doPause()};
+  <script type="module">
+    import * as THREE from "three";
 
-/* ---------- YouTube ---------- */
-let ytp=null,ytReady=false,ytPending=null,ytPaused=true;
-const isPaused=()=>cur&&cur.yt?ytPaused:A.paused;
-const dec=x=>{const e=document.createElement("textarea");e.innerHTML=x;return e.value};
-function saveYT(id){const t=ytMap[id];if(t){ytSaved[id]=t;store.set("yts",ytSaved)}}
-function syncYT(){const o=$("#np").classList.contains("open"),y=!!(cur&&cur.yt);document.body.classList.toggle("ytnp",y&&o);document.body.classList.toggle("ytdock",y&&!o)}
-function setNP(o){$("#np").classList.toggle("open",o);syncYT()}
-function ytInit(){
-  if(window.YT&&YT.Player)return ytCreate();
-  if(document.getElementById("ytapi"))return;
-  window.onYouTubeIframeAPIReady=ytCreate;
-  const sc=document.createElement("script");sc.id="ytapi";sc.src="https://www.youtube.com/iframe_api";
-  sc.onerror=()=>toast("YouTube couldn't load. Check your internet.");
-  document.head.appendChild(sc);
-}
-function ytCreate(){
-  ytp=new YT.Player("ytplayer",{width:"100%",height:"100%",playerVars:{playsinline:1,rel:0},events:{
-    onReady:()=>{ytReady=true;try{ytp.setVolume(vol*100)}catch(e){}if(ytPending){const v=ytPending;ytPending=null;ytp.loadVideoById(v)}},
-    onStateChange:onYT,
-    onError:()=>{ytPaused=true;toast("This video can't be played here. Try another one.");render()}
-  }});
-}
-function loadYT(id){ytPaused=false;if(ytp&&ytReady){ytp.loadVideoById(id);try{ytp.setVolume(vol*100)}catch(e){}}else{ytPending=id;ytInit()}return Promise.resolve()}
-function onYT(e){
-  if(!cur||!cur.yt)return;
-  const st=e.data;
-  if(st===1)ytPaused=false;else if(st===2||st===0||st===5)ytPaused=true;
-  if(st===0)step(1,true);else render();
-}
-function curTime(){return cur&&cur.yt?(ytp&&ytReady&&ytp.getCurrentTime?ytp.getCurrentTime():0):A.currentTime}
-function curDur(){return cur&&cur.yt?(ytp&&ytReady&&ytp.getDuration?ytp.getDuration():0):A.duration}
-function seekTo(x){if(cur&&cur.yt){if(ytp&&ytReady)ytp.seekTo(x,true)}else A.currentTime=x}
-function doPlay(){if(cur&&cur.yt){try{ytp.playVideo()}catch(e){}}else A.play()}
-function doPause(){if(cur&&cur.yt){try{ytp.pauseVideo()}catch(e){}}else A.pause()}
-setInterval(()=>{if(cur&&cur.yt&&!ytPaused)tick()},500);
-async function ytSearch(){
-  const q=($("#q").value||"").trim();
-  if(!q||!CFG.ytKey)return;
-  if(ytCache[q]){ytState={q,ids:ytCache[q],loading:false};renderSearch();return}
-  ytState={q,ids:[],loading:true};renderSearch();track("youtube_search");
-  try{
-    const u="https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&videoEmbeddable=true&maxResults=15&q="+encodeURIComponent(q)+"&key="+encodeURIComponent(CFG.ytKey);
-    const r=await fetch(u),j=await r.json();
-    if(!r.ok)throw new Error((j.error&&j.error.message)||"Search failed");
-    const ids=[];
-    (j.items||[]).forEach(it=>{if(!it.id||!it.id.videoId)return;const t={id:"yt-"+it.id.videoId,yt:it.id.videoId,title:dec(it.snippet.title),artist:dec(it.snippet.channelTitle)};ytMap[t.id]=t;ids.push(t.id)});
-    ytCache[q]=ids;ytState={q,ids,loading:false};
-  }catch(e){
-    const m=String(e.message||e);
-    ytState={q,ids:[],loading:false,err:/quota/i.test(m)?"YouTube's daily search limit is used up. Try again tomorrow.":/referer|referrer|not valid|key/i.test(m)?"The YouTube key was rejected: "+m:/fetch|network/i.test(m)?"Couldn't reach YouTube. Check your internet.":m};
-  }
-  renderSearch();
-}
-function ytBlock(q){
-  if(!CFG.ytKey)return"";
-  const st=ytState,b=`<div class="sec"><h2>On YouTube</h2></div>`;
-  if(st.q!==q)return b+`<button class="btn primary" data-act="ytsearch">Search YouTube for “${esc(q)}”</button>`;
-  if(st.loading)return b+`<div class="empty"><b>Searching YouTube</b></div>`;
-  if(st.err)return b+`<div class="empty"><b>YouTube search didn't work</b>${esc(st.err)}<button class="btn ghost" data-act="ytsearch">Try again</button></div>`;
-  return b+(st.ids.length?rows(st.ids,"yt"):`<div class="empty"><b>No videos found</b>Try a different spelling or the artist name.</div>`);
-}
+    const canvas = document.getElementById("world");
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0xd19363, 0.0035);
 
-/* ---------- Firebase: Google sign-in, cloud sync, VIP from account, analytics ---------- */
-let fb=null,fbUser=null,fbUnsub=null,syncT=null,firstSnap=true;
-function cloudKey(k){return["favs","lists","recents","played","yts"].includes(k)}
-function track(n,p){try{if(fb&&fb.an)fb.logEvent(fb.an,n,p||{})}catch(e){}}
-async function fbInit(){
-  if(!CFG.firebase||fb)return;
-  try{
-    const base="https://www.gstatic.com/firebasejs/10.12.2/";
-    const [app,au,fs,anm]=await Promise.all([
-      import(base+"firebase-app.js"),import(base+"firebase-auth.js"),import(base+"firebase-firestore.js"),
-      import(base+"firebase-analytics.js").catch(()=>null)
-    ]);
-    const a=app.initializeApp(CFG.firebase);
-    const m={app:a,au,fs,auth:au.getAuth(a),db:fs.getFirestore(a),an:null,logEvent:anm?anm.logEvent:null};
-    try{if(anm&&await anm.isSupported())m.an=anm.getAnalytics(a)}catch(e){}
-    fb=m;
-    au.onAuthStateChanged(m.auth,u=>{
-      fbUser=u;firstSnap=true;cloudVip=0;
-      if(fbUnsub){fbUnsub();fbUnsub=null}
-      if(u)watchCloud();
-      render();
+    const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 800);
+    camera.rotation.order = "YXZ";
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    // Golden Sunset Sky
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false,
+      uniforms: {
+        topColor: { value: new THREE.Color(0x2d4356) },
+        horizonColor: { value: new THREE.Color(0xed8547) }
+      },
+      vertexShader: "varying float vY; void main(){ vY = normalize(position).y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+      fragmentShader: "uniform vec3 topColor; uniform vec3 horizonColor; varying float vY; void main(){ float h = smoothstep(-0.1, 0.5, vY); gl_FragColor = vec4(mix(horizonColor, topColor, h), 1.0); }"
     });
-    render();
-  }catch(e){fb=null}
-}
-function watchCloud(){
-  const ref=fb.fs.doc(fb.db,"users",fbUser.uid);
-  fbUnsub=fb.fs.onSnapshot(ref,snap=>{
-    const d=snap.exists()?snap.data():null,v=d&&d.vipUntil;
-    cloudVip=v?(v.toMillis?v.toMillis():Number(v)||0):0;
-    if(firstSnap){firstSnap=false;mergeCloud(d)}
-    render();
-  },()=>toast("Couldn't sync with your account."));
-}
-function mergeCloud(d){
-  if(d){
-    favs=[...new Set([...(d.favs||[]),...favs])];
-    (d.lists||[]).forEach(cl=>{const l=lists.find(x=>x.id===cl.id);if(l)l.ids=[...new Set([...(cl.ids||[]),...l.ids])];else lists.push({id:cl.id,name:cl.name,ids:cl.ids||[]})});
-    recents=[...new Set([...recents,...(d.recents||[])])].slice(0,20);
-    played=Math.max(played,d.played||0);
-    Object.assign(ytSaved,d.yts||{});ytMap=Object.assign({},ytSaved,ytMap);
-    store.set("yts",ytSaved);store.set("favs",favs);store.set("lists",lists);store.set("recents",recents);store.set("played",played);
-  }
-  cloudSched();
-}
-function cloudSched(){if(!fb||!fbUser)return;clearTimeout(syncT);syncT=setTimeout(cloudPush,1200)}
-async function cloudPush(){
-  if(!fb||!fbUser)return;
-  const need=new Set([...favs,...recents,...lists.flatMap(l=>l.ids)]),yts={};
-  need.forEach(id=>{if(ytMap[id])yts[id]=ytMap[id]});
-  try{
-    await fb.fs.setDoc(fb.fs.doc(fb.db,"users",fbUser.uid),{favs,lists,recents:recents.slice(0,20),played,yts,email:fbUser.email||"",name:fbUser.displayName||"",updatedAt:fb.fs.serverTimestamp()},{merge:true});
-  }catch(e){}
-}
-async function fbSignIn(){
-  if(!fb){toast("Sign-in isn't available right now. Check your internet.");return}
-  try{
-    await fb.au.signInWithPopup(fb.auth,new fb.au.GoogleAuthProvider());
-    track("login",{method:"google"});toast("Signed in");
-  }catch(e){
-    const c=e&&e.code;
-    toast(c==="auth/popup-closed-by-user"||c==="auth/cancelled-popup-request"?"Sign-in was cancelled.":c==="auth/unauthorized-domain"?"Add this site under Authorized domains in Firebase.":c==="auth/popup-blocked"?"Allow pop-ups for this site, then try again.":"Couldn't sign in. Try again.");
-  }
-}
-async function fbSignOut(){try{await fb.au.signOut(fb.auth);toast("Signed out")}catch(e){}}
-function accountRow(){
-  if(!CFG.firebase)return"";
-  if(fbUser)return`<div class="panelrow"><span>${esc(fbUser.displayName||"Signed in")}<br><small>${esc(fbUser.email||"")}</small></span><button class="btn ghost" data-act="signout">Sign out</button></div>`;
-  return`<div class="panelrow"><span>Account<br><small>Sync favorites, playlists and VIP across devices</small></span><button class="btn primary" data-act="signin">Sign in</button></div>`;
-}
-function accountHint(){
-  if(!CFG.firebase)return"";
-  return fbUser?`<p><small>Signed in as ${esc(fbUser.email||"your account")}. Use this email when you send your payment screenshot and VIP turns on for your account.</small></p>`:`<div class="btns" style="justify-content:flex-start;margin-bottom:10px"><button class="btn ghost" data-act="signin">Sign in with Google first</button></div>`;
-}
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(600, 16, 16), skyMat));
 
-/* ---------- media session (lock screen, headphones) ---------- */
-function meta(){
-  if(!("mediaSession" in navigator)||!cur)return;
-  try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.title,artist:cur.artist,album:"BEATNEST"})}catch(e){}
-}
-if("mediaSession" in navigator){
-  const ms=navigator.mediaSession,h=(a,f)=>{try{ms.setActionHandler(a,f)}catch(e){}};
-  h("play",doPlay);h("pause",doPause);h("previoustrack",()=>step(-1));h("nexttrack",()=>step(1));
-  h("seekto",d=>{if(d.seekTime!=null)seekTo(d.seekTime)});
-}
+    const hemiLight = new THREE.HemisphereLight(0xffdfba, 0x223026, 0.9);
+    scene.add(hemiLight);
 
-/* ---------- rendering ---------- */
-function row(t,ctx){
-  const fav=favs.includes(t.id),on=cur&&cur.id===t.id;
-  return`<div class="row${on?" on":""}"><button class="rowmain" data-act="play" data-id="${t.id}" data-ctx="${ctx}" aria-label="Play ${esc(t.title)} by ${esc(t.artist)}">${cov(t)}<span class="meta"><b>${esc(t.title)}</b><small>${esc(t.artist)}</small></span>${on&&!isPaused()?'<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>':""}</button><button class="ib" data-act="fav" data-id="${t.id}" aria-pressed="${fav}" aria-label="${fav?"Remove from favorites":"Add to favorites"}">${ic("heart",fav)}</button><button class="ib" data-act="more" data-id="${t.id}" aria-label="More options for ${esc(t.title)}">${ic("more")}</button></div>`;
-}
-const rows=(ids,ctx)=>ids.map(byId).filter(Boolean).map(t=>row(t,ctx)).join("");
-const disc=t=>`<div class="disc" aria-hidden="true"><div class="lbl" style="${t?covStyle(t):"background:var(--accent)"}">${t?esc(t.title.trim().charAt(0).toUpperCase()):"B"}</div></div>`;
+    const sunLight = new THREE.DirectionalLight(0xffa552, 2.0);
+    sunLight.position.set(20, 30, -100);
+    scene.add(sunLight);
 
-function renderHome(){
-  const rec=recents.filter(byId);
-  let h=`<div class="brand"><div class="mark">${ic("play")}</div><h1>BEATNEST</h1></div>`;
-  if(cur){
-    h+=`<div class="hero">${disc(cur)}<h2>${esc(cur.title)}</h2><p>${esc(cur.artist)}</p><div class="btns"><button class="btn primary" data-act="npopen">Open player</button></div></div>`;
-  }else{
-    h+=`<div class="hero">${disc()}<h2>Your music, even without internet</h2><p>Add MP3 files from your phone. They stay saved in this app.</p><div class="btns"><button class="btn primary" data-act="add">${ic("plus")} Add songs</button><button class="btn ghost" data-act="play" data-id="demo-1" data-ctx="lib">Play a starter mix</button>${CFG.ytKey?`<button class="btn ghost" data-act="tab" data-id="search">Search YouTube</button>`:""}</div></div>`;
-  }
-  h+=vipCard();
-  if(rec.length)h+=`<div class="sec"><h2>Play again</h2><button class="link" data-act="clearhist">Clear</button></div><div class="shelf">${rec.slice(0,10).map(id=>{const t=byId(id);return`<button class="card" data-act="play" data-id="${t.id}" data-ctx="recent" aria-label="Play ${esc(t.title)}">${cov(t)}<b>${esc(t.title)}</b><small>${esc(t.artist)}</small></button>`}).join("")}</div>`;
-  h+=`<div class="sec"><h2>Starter mixes</h2></div>${rows(DEMOS.map(d=>d.id),"lib")}`;
-  if(userTracks.length)h+=`<div class="sec"><h2>On your phone</h2><button class="link" data-act="tab" data-id="lib">See all</button></div>${rows(userTracks.slice(0,5).map(t=>t.id),"lib")}`;
-  $("#v-home").innerHTML=h;
-}
-function searchHits(){
-  const q=($("#q").value||"").trim().toLowerCase();
-  if(!q)return[];
-  return all().filter(t=>(t.title+" "+t.artist).toLowerCase().includes(q));
-}
-function renderSearch(){
-  const q=($("#q").value||"").trim(),hits=searchHits();
-  let h="";
-  if(!q)h=`<div class="empty"><b>Find a song</b>${CFG.ytKey?"Search your library and YouTube. Press Enter to search YouTube.":"Type a title or artist from your library."}</div>`;
-  else{
-    if(hits.length)h+=`<small>${hits.length} in your library</small>${rows(hits.map(t=>t.id),"search")}`;
-    else if(!CFG.ytKey)h+=`<div class="empty"><b>No match for “${esc(q)}”</b>Check the spelling, or add the song from your phone.<button class="btn ghost" data-act="add">${ic("plus")} Add songs</button></div>`;
-    h+=ytBlock(q);
-  }
-  $("#sres").innerHTML=h;
-}
-function renderLib(){
-  const seg=(k,l)=>`<button role="tab" data-act="seg" data-id="${k}" aria-selected="${libSeg===k}">${l}</button>`;
-  let h=`<div class="brand"><h1>Library</h1></div><div class="seg" role="tablist">${seg("songs","Songs")}${seg("fav","Favorites")}${seg("lists","Playlists")}</div>`;
-  if(libSeg==="songs"){
-    h+=`<div class="btns" style="justify-content:flex-start;margin-bottom:8px"><button class="btn ghost" data-act="add">${ic("plus")} Add songs</button></div>`+rows(all().map(t=>t.id),"lib");
-  }else if(libSeg==="fav"){
-    const f=favs.filter(byId);
-    h+=f.length?rows(f,"fav"):`<div class="empty"><b>No favorites yet</b>Tap the heart on any song to keep it here.</div>`;
-  }else if(openList){
-    const l=lists.find(x=>x.id===openList);
-    if(!l){openList=null;return renderLib()}
-    const ids=l.ids.filter(byId);
-    h+=`<button class="link" data-act="plback">‹ All playlists</button><div class="sec" style="margin-top:6px"><h2>${esc(l.name)}</h2><button class="link" data-act="pldel" data-id="${l.id}">Delete</button></div>`;
-    h+=ids.length?`<div class="btns" style="justify-content:flex-start;margin-bottom:8px"><button class="btn primary" data-act="play" data-id="${ids[0]}" data-ctx="pl:${l.id}">${ic("play")} Play all</button></div>${rows(ids,"pl:"+l.id)}`:`<div class="empty"><b>This playlist is empty</b>Open “More” on any song and choose “Add to playlist”.</div>`;
-  }else{
-    h+=`<div class="btns" style="justify-content:flex-start;margin-bottom:8px"><button class="btn ghost" data-act="newpl">${ic("plus")} New playlist</button></div>`;
-    h+=lists.length?lists.map(l=>`<button class="lrow" data-act="plopen" data-id="${l.id}"><span class="meta"><b>${esc(l.name)}</b><small>${l.ids.filter(byId).length} songs</small></span></button>`).join(""):`<div class="empty"><b>No playlists yet</b>Group songs for the gym, travel, or late nights.</div>`;
-  }
-  $("#v-lib").innerHTML=h;
-}
-function renderMe(){
-  const th=store.get("theme","auto"),ac=store.get("accent","blue");
-  const o=(act,id,l,on)=>`<button class="opt" data-act="${act}" data-id="${id}" aria-pressed="${on}">${l}</button>`;
-  let h=`<div class="brand"><h1>Profile</h1></div>
-  <div class="stats"><div class="stat"><b>${favs.filter(byId).length}</b><small>Favorites</small></div><div class="stat"><b>${played}</b><small>Plays</small></div><div class="stat"><b>${userTracks.length}</b><small>On phone</small></div></div>
-  ${accountRow()}${memRow()}
-  <div class="panelrow"><span>Appearance</span><div class="opts">${o("theme","auto","Auto",th==="auto")}${o("theme","light","Light",th==="light")}${o("theme","dark","Dark",th==="dark")}</div></div>
-  <div class="panelrow"><span>Accent color</span><div class="opts">${o("accent","blue","Blue",ac==="blue")}${o("accent","green","Green",ac==="green")}${o("accent","violet","Violet",ac==="violet")}</div></div>
-  <div class="panelrow"><span>Sleep timer<br><small>${sleepAt?"Stops in about "+Math.max(1,Math.round((sleepAt-Date.now())/60000))+" min":"Off"}</small></span><button class="btn ghost" data-act="sleep">${ic("moon")} Set</button></div>
-  <div class="panelrow"><span>Clear play history</span><button class="btn ghost" data-act="clearhist">Clear</button></div>
-  <div class="panelrow"><span>Reset the app<br><small>Removes saved songs, favorites and playlists.</small></span><button class="btn ghost" data-act="reset">Reset</button></div>`;
-  h+=`<p style="margin-top:22px"><small>BEATNEST v5.3 · Keys: Space play/pause, ← → seek, N next, P previous</small></p>`;
-  $("#v-me").innerHTML=h;
-}
-function renderMini(){
-  const m=$("#mini");
-  if(!cur){m.hidden=true;return}
-  m.hidden=false;
-  m.innerHTML=`<div class="inner"><button class="rowmain" data-act="npopen" aria-label="Open player: ${esc(cur.title)}">${cov(cur)}<span class="meta"><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span></button><button class="play" data-act="toggle" aria-label="${isPaused()?"Play":"Pause"}">${ic(isPaused()?"play":"pause")}</button></div><div class="bar"><i id="mprog"></i></div>`;
-  tick();
-}
-function renderNP(){
-  const n=$("#np");
-  if(!cur){n.innerHTML="";return}
-  const fav=favs.includes(cur.id),i=queue.indexOf(cur.id),next=queue.slice(i+1,i+6);
-  n.innerHTML=`<div class="nptop"><button class="ib" data-act="npclose" aria-label="Close player">${ic("down")}</button><span>Now playing</span><button class="ib" data-act="more" data-id="${cur.id}" aria-label="More options">${ic("more")}</button></div>
-  ${cur.yt?`<div style="height:220px;margin:14px 0 6px"></div>`:`<div style="margin:14px 0 6px">${disc(cur)}</div>`}
-  <div class="npmeta"><div><h2>${esc(cur.title)}</h2><small>${esc(cur.artist)}</small></div><button class="ib" data-act="fav" data-id="${cur.id}" aria-pressed="${fav}" aria-label="${fav?"Remove from favorites":"Add to favorites"}">${ic("heart",fav)}</button></div>
-  <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
-  <div class="times"><span id="tcur">0:00</span><span id="tdur">0:00</span></div>
-  <div class="ctrls"><button class="ib" data-act="shuffle" aria-pressed="${shuffle}" aria-label="Shuffle">${ic("shuffle")}</button><button class="ib" data-act="prev" aria-label="Previous">${ic("prev")}</button><button class="play" data-act="toggle" aria-label="${isPaused()?"Play":"Pause"}">${ic(isPaused()?"play":"pause")}</button><button class="ib" data-act="next" aria-label="Next">${ic("next")}</button><button class="ib" data-act="repeat" aria-pressed="${repeat>0}" aria-label="Repeat: ${["off","all","one"][repeat]}">${ic(repeat===2?"repeat1":"repeat")}</button></div>
-  <div class="volrow">${ic("vol")}<input id="vol" type="range" min="0" max="100" value="${Math.round(vol*100)}" aria-label="Volume"><button class="ib" data-act="sleep" aria-label="Sleep timer">${ic("moon")}</button></div>
-  ${next.length&&!cur.yt?`<div class="sec"><h2>Up next</h2></div>${rows(next,"queue")}`:""}`;
-  tick();
-}
-function tick(){
-  const d=curDur(),c=curTime();
-  if(!isFinite(d)||!d)return;
-  const p=c/d,mp=$("#mprog");if(mp)mp.style.width=(p*100)+"%";
-  const s=$("#seek");if(s&&!seeking)s.value=p*1000;
-  const tc=$("#tcur"),td=$("#tdur");if(tc)tc.textContent=fmt(c);if(td)td.textContent=fmt(d);
-}
-function render(){
-  document.body.classList.toggle("playing",!!cur&&!isPaused());syncYT();
-  renderHome();renderSearch();renderLib();renderMe();renderMini();renderNP();
-  ["home","search","lib","me"].forEach(k=>{$("#v-"+k).hidden=tab!==k});
-  document.querySelectorAll("nav button").forEach((b,i)=>{
-    const k=b.dataset.id;b.innerHTML=ic({home:"home",search:"search",lib:"lib",me:"user"}[k])+`<span>${{home:"Home",search:"Search",lib:"Library",me:"Profile"}[k]}</span>`;
-    if(k===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
-  });
-  $("#sic").innerHTML=ic("search");
-}
-function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
-function sheet(html){const s=$("#sheet");s.innerHTML=`<div class="scrim" data-act="close"></div><div class="panel" role="dialog" aria-modal="true">${html}</div>`;s.hidden=false;const f=s.querySelector("input,button.lrow,.btn");if(f)f.focus()}
-function closeSheet(){const s=$("#sheet");s.hidden=true;s.innerHTML=""}
+    const torchLight = new THREE.PointLight(0xff8822, 0, 15, 1.6);
+    camera.add(torchLight);
+    scene.add(camera);
 
-/* ---------- actions ---------- */
-function setTheme(v){store.set("theme",v);const r=document.documentElement;v==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",v)}
-function setAccent(v){store.set("accent",v);const r=document.documentElement;v==="blue"?r.removeAttribute("data-accent"):r.setAttribute("data-accent",v)}
-function setSleep(min){
-  clearTimeout(sleepTimer);sleepAt=0;
-  if(min){sleepAt=Date.now()+min*60000;sleepTimer=setTimeout(()=>{doPause();sleepAt=0;toast("Sleep timer ended");render()},min*60000);toast("Music will stop in "+min+" min")}
-  else toast("Sleep timer off");
-  closeSheet();renderMe();
-}
-function addToList(listId,songId){
-  const l=lists.find(x=>x.id===listId);if(!l)return;saveYT(songId);
-  if(!l.ids.includes(songId))l.ids.push(songId);
-  store.set("lists",lists);toast("Added to "+l.name);closeSheet();render();
-}
-async function addFiles(fl){
-  let n=0;
-  for(const f of fl){
-    if(!(f.type||"").startsWith("audio/")&&!/\.(mp3|m4a|wav|ogg|aac|flac)$/i.test(f.name))continue;
-    const t={id:"u-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:f.name.replace(/\.[^.]+$/,"").replace(/[_]+/g," ").trim()||"Untitled",artist:"On this phone",blob:f};
-    userTracks.push(t);await tx("readwrite",s=>s.put(t));n++;
-  }
-  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-  toast(n?`Added ${n} ${n===1?"song":"songs"}`:"Choose audio files like MP3 or M4A");render();
-}
-async function removeTrack(id){
-  userTracks=userTracks.filter(t=>t.id!==id);await tx("readwrite",s=>s.delete(id));
-  favs=favs.filter(x=>x!==id);recents=recents.filter(x=>x!==id);lists.forEach(l=>l.ids=l.ids.filter(x=>x!==id));
-  store.set("favs",favs);store.set("recents",recents);store.set("lists",lists);
-  if(cur&&cur.id===id){doPause();A.pause();A.removeAttribute("src");cur=null;setNP(false)}
-  closeSheet();toast("Removed from this phone");render();
-}
-async function resetAll(){
-  doPause();A.pause();A.removeAttribute("src");cur=null;queue=[];userTracks=[];favs=[];recents=[];lists=[];played=0;
-  await tx("readwrite",s=>s.clear());store.wipe();store.set("vip",vip);store.set("used",usedCodes);store.set("day",dayPlays);setTheme("auto");setAccent("blue");
-  setNP(false);closeSheet();toast("BEATNEST was reset");render();cloudSched();
-}
+    // Terrain
+    function getTerrainY(x, z) {
+      return Math.sin(x * 0.05) * 1.5 + Math.cos(z * 0.04) * 1.2;
+    }
 
-document.addEventListener("click",e=>{
-  const b=e.target.closest("[data-act]");if(!b)return;
-  const a=b.dataset.act,id=b.dataset.id;
-  switch(a){
-    case"tab":tab=id;if(id==="lib"&&libSeg!=="lists")openList=null;render();$("#main").scrollTop=0;if(id==="search")$("#q").focus();break;
-    case"play":playTrack(id,b.dataset.ctx);break;
-    case"toggle":toggle();break;
-    case"next":step(1);break;
-    case"prev":step(-1);break;
-    case"shuffle":shuffle=!shuffle;store.set("shuffle",shuffle);renderNP();break;
-    case"repeat":repeat=(repeat+1)%3;store.set("repeat",repeat);renderNP();break;
-    case"fav":saveYT(id);favs=favs.includes(id)?favs.filter(x=>x!==id):favs.concat(id);store.set("favs",favs);render();break;
-    case"npopen":if(cur){setNP(true);$("#np .ib")&&$("#np .ib").focus()}break;
-    case"npclose":setNP(false);break;
-    case"add":$("#files").click();break;
-    case"seg":libSeg=id;openList=null;renderLib();break;
-    case"plopen":openList=id;renderLib();break;
-    case"plback":openList=null;renderLib();break;
-    case"newpl":sheet(`<h3>New playlist</h3><input class="field" id="plname" maxlength="40" placeholder="Playlist name" aria-label="Playlist name"><div class="btns"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" data-act="plcreate" data-id="${id||""}">Create playlist</button></div>`);break;
-    case"plcreate":{const n=($("#plname").value||"").trim();if(!n){toast("Give the playlist a name");return}
-      const l={id:"l-"+Date.now().toString(36),name:n,ids:[]};lists.push(l);store.set("lists",lists);
-      if(id)addToList(l.id,id);else{closeSheet();libSeg="lists";openList=null;render()}break}
-    case"pldel":lists=lists.filter(x=>x.id!==id);store.set("lists",lists);openList=null;toast("Playlist deleted");render();break;
-    case"more":{const t=byId(id);if(!t)return;
-      sheet(`<h3>${esc(t.title)}</h3><p>${esc(t.artist)}</p>
-      <button class="lrow" data-act="addpl" data-id="${id}">Add to playlist</button>
-      <button class="lrow" data-act="playnext" data-id="${id}">Play next</button>
-      ${t.demo||t.yt?"":`<button class="lrow" data-act="rm" data-id="${id}" style="color:#C8372D">Remove from this phone</button>`}`);break}
-    case"addpl":sheet(`<h3>Add to playlist</h3>${lists.map(l=>`<button class="lrow" data-act="addto" data-id="${l.id}" data-song="${id}">${esc(l.name)}</button>`).join("")}<button class="lrow" data-act="newpl" data-id="${id}">${ic("plus")} New playlist</button>`);break;
-    case"addto":addToList(id,b.dataset.song);break;
-    case"playnext":{if(!queue.length){playTrack(id,"lib")}else{queue=queue.filter(x=>x!==id);const i=queue.indexOf(cur&&cur.id);queue.splice(i+1,0,id);toast("Playing next");renderNP()}closeSheet();break}
-    case"rm":removeTrack(id);break;
-    case"sleep":sheet(`<h3>Sleep timer</h3>${[15,30,45,60].map(m=>`<button class="lrow" data-act="setsleep" data-id="${m}">Stop after ${m} minutes</button>`).join("")}<button class="lrow" data-act="setsleep" data-id="0">Turn off</button>`);break;
-    case"setsleep":setSleep(+id);break;
-    case"theme":setTheme(id);renderMe();break;
-    case"accent":setAccent(id);renderMe();break;
-    case"clearhist":recents=[];store.set("recents",recents);toast("History cleared");render();break;
-    case"reset":sheet(`<h3>Reset BEATNEST?</h3><p>This removes songs saved in the app, favorites, playlists and settings. Files on your phone are not touched, and your VIP membership stays.</p><div class="btns"><button class="btn ghost" data-act="close">Keep my data</button><button class="btn danger" data-act="resetgo">Reset everything</button></div>`);break;
-    case"resetgo":resetAll();break;
-    case"signin":fbSignIn();break;
-    case"signout":fbSignOut();break;
-    case"ytsearch":ytSearch();break;
-    case"vip":vipSheet(false);break;
-    case"copyupi":try{navigator.clipboard.writeText(CFG.upiId).then(()=>toast("UPI ID copied"),()=>toast("UPI ID: "+CFG.upiId))}catch(e){toast("UPI ID: "+CFG.upiId)}break;
-    case"activate":{const c=($("#vipcode").value||"").trim().toUpperCase().replace(/\s+/g,"");if(!c){toast("Enter your VIP code");return}activate(c);break}
-    case"close":closeSheet();break;
-  }
-});
-document.addEventListener("input",e=>{
-  if(e.target.id==="seek"){seeking=true;{const d=curDur();if(isFinite(d)&&d)seekTo(e.target.value/1000*d)}}
-  else if(e.target.id==="vol"){vol=e.target.value/100;A.volume=vol;if(ytp&&ytReady)ytp.setVolume(vol*100);store.set("vol",vol)}
-  else if(e.target.id==="q"){clearTimeout(renderSearch.t);renderSearch.t=setTimeout(renderSearch,150)}
-});
-document.addEventListener("change",e=>{if(e.target.id==="seek")seeking=false});
-$("#files").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
-document.addEventListener("keydown",e=>{
-  const tag=(e.target.tagName||"").toLowerCase();
-  if(e.key==="Enter"&&e.target.id==="q"){e.preventDefault();ytSearch();return}
-  if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else setNP(false);return}
-  if(tag==="input"||tag==="textarea"||e.target.closest("button")&&e.key===" ")return;
-  if(e.key===" "){e.preventDefault();toggle()}
-  else if(e.key==="ArrowRight"&&cur)seekTo(Math.min(curDur()||0,curTime()+10));
-  else if(e.key==="ArrowLeft"&&cur)seekTo(Math.max(0,curTime()-10));
-  else if(e.key.toLowerCase()==="n")step(1);
-  else if(e.key.toLowerCase()==="p")step(-1);
-});
-A.addEventListener("timeupdate",tick);
-A.addEventListener("loadedmetadata",tick);
-A.addEventListener("play",render);
-A.addEventListener("pause",render);
-A.addEventListener("ended",()=>step(1,true));
-A.addEventListener("error",()=>{if(cur&&A.src)toast("This file won't play. Try another MP3.")});
+    const groundGeo = new THREE.PlaneGeometry(300, 300, 60, 60);
+    const pos = groundGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), z = -pos.getY(i);
+      pos.setZ(i, getTerrainY(x, z));
+    }
+    groundGeo.computeVertexNormals();
+    const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x424e35, roughness: 0.95 }));
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
 
-/* ---------- start ---------- */
-(async()=>{
-  setTheme(store.get("theme","auto"));setAccent(store.get("accent","blue"));
-  db=await openDB();
-  const saved=await tx("readonly",s=>s.getAll());
-  userTracks=Array.isArray(saved)?saved:[];
-  favs=favs.filter(byId);
-  render();
-  fbInit();
-})();
-})();
-</script>
+    // Mountains
+    const mtnMat = new THREE.MeshStandardMaterial({ color: 0x525c66 });
+    for (let i = 0; i < 7; i++) {
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(35, 60, 5), mtnMat);
+      const a = (i / 7) * Math.PI + 0.3;
+      cone.position.set(Math.cos(a) * 170, 20, -120 + Math.sin(a) * 30);
+      scene.add(cone);
+    }
+
+    // River
+    const river = new THREE.Mesh(
+      new THREE.PlaneGeometry(30, 260),
+      new THREE.MeshStandardMaterial({ color: 0x1d4d68, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.85 })
+    );
+    river.rotation.x = -Math.PI / 2;
+    river.position.set(-35, -0.6, -20);
+    scene.add(river);
+
+    // Trees
+    const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 3.5, 5);
+    const leavesGeo = new THREE.ConeGeometry(1.9, 4, 5);
+    const trunkM = new THREE.MeshStandardMaterial({ color: 0x3d2b1f });
+    const leavesM = new THREE.MeshStandardMaterial({ color: 0x213a29 });
+
+    const trees = [];
+    for (let i = 0; i < 45; i++) {
+      const tx = (Math.random() - 0.5) * 160;
+      const tz = (Math.random() - 0.5) * 160;
+      if (Math.hypot(tx, tz) < 14) continue;
+      const g = new THREE.Group();
+      const tr = new THREE.Mesh(trunkGeo, trunkM); tr.position.y = 1.75;
+      const lv = new THREE.Mesh(leavesGeo, leavesM); lv.position.y = 4.2;
+      g.add(tr, lv);
+      g.position.set(tx, getTerrainY(tx, tz), tz);
+      scene.add(g);
+      trees.push({ group: g, x: tx, z: tz, hp: 3 });
+    }
+
+    // Cabin & Campfire
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(7, 3.5, 6), new THREE.MeshStandardMaterial({ color: 0x4a3625 }));
+    cabin.position.set(14, getTerrainY(14, -10) + 1.75, -10);
+    scene.add(cabin);
+
+    const campLight = new THREE.PointLight(0xff6611, 2.5, 12, 1.8);
+    campLight.position.set(0, 1.2, -6);
+    scene.add(campLight);
+
+    // Player State
+    const player = { x: 0, z: 0, y: 1.7, yaw: 0, pitch: 0, hp: 100, food: 85, water: 80, wood: 10, meat: 3 };
+    let activeTool = "axe";
+    let joyMove = { x: 0, y: 0 };
+
+    function toast(text) {
+      const t = document.getElementById("toast");
+      t.textContent = text; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
+    // Start Button -> Landscape & Fullscreen
+    document.getElementById("btn-start").addEventListener("click", async () => {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("touch-layer").style.display = "block";
+
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          await document.documentElement.webkitRequestFullscreen();
+        }
+      } catch (err) {}
+
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock("landscape");
+        }
+      } catch (err) {}
+
+      resize();
+    });
+
+    function resize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.addEventListener("resize", resize);
+
+    // Joystick Touch Handler
+    const joyBase = document.getElementById("joy-base");
+    const joyStick = document.getElementById("joy-stick");
+    let joyTouchId = null;
+
+    joyBase.addEventListener("touchstart", e => {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      joyTouchId = touch.identifier;
+      handleJoy(touch);
+    }, { passive: false });
+
+    joyBase.addEventListener("touchmove", e => {
+      e.preventDefault();
+      for (let t of e.changedTouches) {
+        if (t.identifier === joyTouchId) handleJoy(t);
+      }
+    }, { passive: false });
+
+    const endJoy = e => {
+      for (let t of e.changedTouches) {
+        if (t.identifier === joyTouchId) {
+          joyTouchId = null;
+          joyMove = { x: 0, y: 0 };
+          joyStick.style.left = "50%"; joyStick.style.top = "50%";
+        }
+      }
+    };
+    joyBase.addEventListener("touchend", endJoy);
+    joyBase.addEventListener("touchcancel", endJoy);
+
+    function handleJoy(touch) {
+      const rect = joyBase.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      let dx = touch.clientX - cx;
+      let dy = touch.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      const maxR = rect.width / 2;
+
+      if (dist > maxR) {
+        dx = (dx / dist) * maxR;
+        dy = (dy / dist) * maxR;
+      }
+      joyStick.style.left = `${50 + (dx / maxR) * 35}%`;
+      joyStick.style.top = `${50 + (dy / maxR) * 35}%`;
+      joyMove.x = dx / maxR;
+      joyMove.y = dy / maxR;
+    }
+
+    // Look/Camera Touch Handler
+    const lookPad = document.getElementById("look-pad");
+    let lookTouchId = null, lastTouchX = 0, lastTouchY = 0;
+
+    lookPad.addEventListener("touchstart", e => {
+      const t = e.changedTouches[0];
+      lookTouchId = t.identifier;
+      lastTouchX = t.clientX;
+      lastTouchY = t.clientY;
+    });
+
+    lookPad.addEventListener("touchmove", e => {
+      for (let t of e.changedTouches) {
+        if (t.identifier === lookTouchId) {
+          const dx = t.clientX - lastTouchX;
+          const dy = t.clientY - lastTouchY;
+          player.yaw -= dx * 0.005;
+          player.pitch = Math.max(-1.2, Math.min(1.2, player.pitch - dy * 0.004));
+          lastTouchX = t.clientX;
+          lastTouchY = t.clientY;
+        }
+      }
+    });
+
+    const endLook = e => {
+      for (let t of e.changedTouches) {
+        if (t.identifier === lookTouchId) lookTouchId = null;
+      }
+    };
+    lookPad.addEventListener("touchend", endLook);
+    lookPad.addEventListener("touchcancel", endLook);
+
+    // Hotbar selection
+    document.querySelectorAll(".slot").forEach(s => {
+      s.addEventListener("click", () => {
+        document.querySelectorAll(".slot").forEach(sl => sl.classList.remove("active"));
+        s.classList.add("active");
+        activeTool = s.dataset.tool;
+        torchLight.intensity = activeTool === "torch" ? 2.2 : 0;
+        toast("Equipped: " + activeTool.toUpperCase());
+      });
+    });
+
+    // Action Buttons
+    document.getElementById("btn-act").addEventListener("click", () => {
+      if (activeTool === "axe") {
+        let hit = false;
+        trees.forEach(tr => {
+          if (Math.hypot(tr.x - player.x, tr.z - player.z) < 3.8 && tr.hp > 0) {
+            tr.hp--; hit = true;
+            player.wood += 2;
+            document.getElementById("txt-wood").textContent = player.wood;
+            toast("+2 Wood 🪵");
+            if (tr.hp <= 0) scene.remove(tr.group);
+          }
+        });
+        if (!hit) toast("Chopping air 🪓");
+      } else if (activeTool === "food") {
+        if (player.meat > 0) {
+          player.meat--;
+          player.food = Math.min(100, player.food + 25);
+          document.getElementById("txt-food").textContent = player.meat;
+          toast("Ate cooked meat 🥩");
+        } else toast("No food left!");
+      }
+    });
+
+    document.getElementById("btn-use").addEventListener("click", () => {
+      if (Math.hypot(player.x - (-35), player.z - (-20)) < 24) {
+        player.water = Math.min(100, player.water + 30);
+        toast("Drank fresh river water 💧");
+      } else {
+        toast("Campfire safe zone 🔥");
+      }
+    });
+
+    // Neon habitat, hydroponic greenhouse and smart salvage around the original outpost.
+    scene.fog.color.set(0x173c42);
+    sunLight.color.set(0x83e9d8);
+    hemiLight.color.set(0xb6f2e8);
+    cabin.visible = false;
+    const techMetal = new THREE.MeshStandardMaterial({ color: 0x203943, metalness: 0.68, roughness: 0.36 });
+    const techTrim = new THREE.MeshStandardMaterial({ color: 0x56f5df, emissive: 0x1ecab8, emissiveIntensity: 1.25, metalness: 0.25, roughness: 0.25 });
+    const techGlass = new THREE.MeshStandardMaterial({ color: 0x53cbd4, emissive: 0x0f5967, emissiveIntensity: 0.32, transparent: true, opacity: 0.34, metalness: 0.25, roughness: 0.12 });
+    const techSolar = new THREE.MeshStandardMaterial({ color: 0x174f7a, emissive: 0x0b5277, emissiveIntensity: 0.42, metalness: 0.65, roughness: 0.23 });
+    function techBox(parent, w, h, d, material, x, y, z) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+      m.position.set(x, y, z); parent.add(m); return m;
+    }
+    function techPanel(parent, x, y, z, w, d) {
+      const p = new THREE.Group(); p.position.set(x, y, z); parent.add(p);
+      const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.12, 1, 5), techMetal);
+      stand.position.y = -0.48; p.add(stand);
+      const plate = techBox(p, w, 0.1, d, techSolar, 0, 0.08, 0);
+      plate.rotation.x = -0.12;
+      for (let i = 1; i < 4; i++) {
+        const line = techBox(p, 0.035, 0.035, d - 0.12, techTrim, -w / 2 + w * i / 4, 0.15, 0);
+        line.rotation.x = -0.12;
+      }
+      return p;
+    }
+
+    const baseGlow = new THREE.PointLight(0x32e3d4, 0.8, 42);
+    baseGlow.position.set(6, 8, -13); scene.add(baseGlow);
+    const habitat = new THREE.Group();
+    habitat.position.set(14, getTerrainY(14, -10), -10);
+    scene.add(habitat);
+    techBox(habitat, 10, 0.45, 8, techMetal, 0, 0.24, 0);
+    techBox(habitat, 7.3, 3.9, 5.8, new THREE.MeshStandardMaterial({ color: 0x263c47, metalness: 0.42, roughness: 0.48 }), 0, 2.35, 0);
+    techBox(habitat, 8.1, 0.32, 6.6, techMetal, 0, 4.45, 0);
+    techBox(habitat, 7.6, 0.06, 6.2, techTrim, 0, 4.64, 0);
+    for (const x of [-3.75, 3.75]) {
+      techBox(habitat, 0.1, 4.1, 6.1, techTrim, x, 2.35, 0);
+      techBox(habitat, 0.65, 1.0, 0.08, techGlass, x * 0.55, 2.65, 2.94);
+    }
+    techBox(habitat, 1.35, 2.25, 0.12, techMetal, 0, 1.45, 2.96);
+    techBox(habitat, 1.5, 0.07, 0.09, techTrim, 0, 2.62, 3.05);
+    techPanel(habitat, -2.1, 5.1, -0.6, 2.0, 1.5);
+    techPanel(habitat, 0, 5.1, -0.6, 2.0, 1.5);
+    techPanel(habitat, 2.1, 5.1, -0.6, 2.0, 1.5);
+    const aerial = new THREE.Group(); aerial.position.set(3.3, 4.8, -2.4); habitat.add(aerial);
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 2.4, 6), techMetal);
+    mast.position.y = 1.15; aerial.add(mast);
+    const mastLamp = new THREE.Mesh(new THREE.SphereGeometry(0.24, 8, 6), techTrim);
+    mastLamp.position.y = 2.35; aerial.add(mastLamp);
+    const habitatGlow = new THREE.PointLight(0x50efd8, 1.1, 24);
+    habitatGlow.position.set(0, 2.5, 1); habitat.add(habitatGlow);
+
+    const techBeds = [];
+    const farms = [];
+    let techSeeds = 4, techScrap = 8, builtTech = 0, techClock = 0, jumpTime = 0;
+    function makeTechFarm(cx, cz, seeded) {
+      const g = new THREE.Group(); g.position.set(cx, getTerrainY(cx, cz), cz); scene.add(g);
+      techBox(g, 12, 0.35, 10, techMetal, 0, 0.18, 0);
+      for (const x of [-5.7, 5.7]) for (const z of [-4.6, 4.6]) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 3.55, 5), techMetal);
+        post.position.set(x, 2.0, z); g.add(post);
+      }
+      techBox(g, 11.5, 0.09, 9.2, techGlass, 0, 3.35, 0);
+      techBox(g, 0.08, 3.2, 9.1, techTrim, -5.7, 2.0, 0);
+      techBox(g, 0.08, 3.2, 9.1, techTrim, 5.7, 2.0, 0);
+      techBox(g, 11.5, 0.08, 0.08, techTrim, 0, 3.55, -4.6);
+      techBox(g, 11.5, 0.08, 0.08, techTrim, 0, 3.55, 4.6);
+      const localBeds = [];
+      for (let row = 0; row < 2; row++) for (let col = 0; col < 4; col++) {
+        const bed = new THREE.Group(); bed.position.set(-4.35 + col * 2.9, 0.48, row ? 2.0 : -2.0); g.add(bed);
+        techBox(bed, 2.35, 0.36, 1.45, techMetal, 0, 0, 0);
+        techBox(bed, 2.15, 0.08, 1.25, new THREE.MeshStandardMaterial({ color: 0x44392b }), 0, 0.22, 0);
+        techBox(bed, 2.2, 0.045, 0.05, techTrim, 0, 0.25, -0.62);
+        const crop = new THREE.Group(); crop.position.y = 0.28; bed.add(crop);
+        for (let n = 0; n < 3; n++) {
+          const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.055, 0.8, 5), new THREE.MeshStandardMaterial({ color: 0x6fe181 }));
+          stalk.position.set((n - 1) * 0.52, 0.4, 0); crop.add(stalk);
+          const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 5), new THREE.MeshStandardMaterial({ color: 0x75e08a }));
+          leaf.scale.set(1.35, 0.6, 0.8); leaf.position.set((n - 1) * 0.52, 0.58, 0.04); crop.add(leaf);
+          if (n === 1) {
+            const fruit = new THREE.Mesh(new THREE.SphereGeometry(0.14, 7, 6), new THREE.MeshStandardMaterial({ color: 0xffbd55, emissive: 0x704500, emissiveIntensity: 0.4 }));
+            fruit.position.set(0, 0.84, 0.08); crop.add(fruit);
+          }
+        }
+        const index = row * 4 + col;
+        const status = seeded && index < 3 ? "ready" : seeded && index < 5 ? "growing" : "empty";
+        crop.scale.setScalar(status === "ready" ? 1 : status === "growing" ? 0.3 : 0);
+        const item = { mesh: bed, crop: crop, status: status, plantedAt: status === "ready" ? -40 : techClock };
+        localBeds.push(item); techBeds.push(item);
+      }
+      farms.push({ group: g, x: cx, z: cz, beds: localBeds });
+    }
+    makeTechFarm(-10, -15, true);
+
+    const techSalvage = [];
+    const builtPurifiers = [];
+    function makeSalvage(x, z) {
+      const g = new THREE.Group(); g.position.set(x, getTerrainY(x, z), z); scene.add(g);
+      techBox(g, 1.6, 1.1, 1.3, techMetal, 0, 0.55, 0);
+      techBox(g, 1.72, 0.1, 1.4, techTrim, 0, 1.12, 0);
+      techBox(g, 0.08, 0.65, 0.08, techTrim, 0, 0.65, 0.7);
+      const lamp = new THREE.PointLight(0x55f4e1, 0.55, 6); lamp.position.y = 1.4; g.add(lamp);
+      techSalvage.push({ group: g, x: x, z: z, live: true });
+    }
+    makeSalvage(-20, -6); makeSalvage(25, -20); makeSalvage(-25, 22); makeSalvage(36, 18);
+
+    function syncTechHud() {
+      document.getElementById("tech-wood").textContent = player.wood;
+      document.getElementById("tech-scrap").textContent = techScrap;
+      document.getElementById("tech-seeds").textContent = techSeeds;
+      document.getElementById("txt-seeds").textContent = techSeeds;
+      document.getElementById("txt-wood").textContent = player.wood;
+    }
+    function closestBed() {
+      let best = null, dist = Infinity;
+      for (const b of techBeds) {
+        const x = b.mesh.getWorldPosition(new THREE.Vector3()).x;
+        const z = b.mesh.getWorldPosition(new THREE.Vector3()).z;
+        const d = Math.hypot(x - player.x, z - player.z);
+        if (d < dist) { best = b; dist = d; }
+      }
+      return { bed: best, distance: dist };
+    }
+    function plantOrHarvest() {
+      const target = closestBed();
+      if (!target.bed || target.distance > 6.5) return false;
+      const bed = target.bed;
+      if (bed.status === "ready") {
+        bed.status = "empty"; bed.crop.scale.setScalar(0);
+        player.meat++; techSeeds++; syncTechHud();
+        document.getElementById("txt-food").textContent = player.meat;
+        toast("+1 fresh ration · +1 seed");
+        return true;
+      }
+      if (bed.status === "growing") { toast("Hydroponic crop is growing. Check back soon."); return true; }
+      if (techSeeds <= 0) { toast("No seeds. Harvest a ripe bed to collect more."); return true; }
+      techSeeds--; bed.status = "growing"; bed.plantedAt = techClock; bed.crop.scale.setScalar(0.22);
+      syncTechHud(); toast("Seed planted · smart bed is online");
+      return true;
+    }
+    function techInteract() {
+      if (plantOrHarvest()) return true;
+      let closest = null, dist = Infinity;
+      for (const node of techSalvage) if (node.live) {
+        const d = Math.hypot(node.x - player.x, node.z - player.z);
+        if (d < dist) { closest = node; dist = d; }
+      }
+      if (closest && dist < 4.5) {
+        closest.live = false; scene.remove(closest.group); techScrap += 3;
+        syncTechHud(); toast("Tech salvage recovered · +3 components"); return true;
+      }
+      return false;
+    }
+    function buildTech(type) {
+      const costs = { relay: [2,4], purifier: [3,5], farm: [6,4] };
+      const cost = costs[type]; if (!cost) return;
+      if (player.wood < cost[0] || techScrap < cost[1]) { toast("Need more wood or tech salvage to build this module."); return; }
+      player.wood -= cost[0]; techScrap -= cost[1]; builtTech++; syncTechHud();
+      const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+      const x = player.x + fx * 9 + Math.cos(player.yaw) * ((builtTech % 3 - 1) * 6);
+      const z = player.z + fz * 9 - Math.sin(player.yaw) * ((builtTech % 3 - 1) * 6);
+      if (type === "farm") { makeTechFarm(x, z, false); toast("Hydroponic bay deployed · 8 smart beds online"); }
+      else {
+        const g = new THREE.Group(); g.position.set(x, getTerrainY(x, z), z); scene.add(g);
+        techBox(g, 3, 0.35, 3, techMetal, 0, 0.18, 0);
+        if (type === "relay") {
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 4.8, 6), techMetal); pole.position.y = 2.7; g.add(pole);
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.08, 6, 12), techTrim); ring.position.y = 4; ring.rotation.x = Math.PI / 2; g.add(ring);
+          techPanel(g, -1.3, 1.4, 1.1, 1.7, 1.3); techPanel(g, 1.3, 1.4, 1.1, 1.7, 1.3);
+          const light = new THREE.PointLight(0x55f5df, 0.85, 17); light.position.y = 4.2; g.add(light);
+          toast("Solar relay built · power grid expanded");
+        } else {
+          const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.76, 2.3, 8), techMetal); tank.position.y = 1.45; g.add(tank);
+          const band = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.07, 5, 12), techTrim); band.position.y = 1.7; band.rotation.x = Math.PI / 2; g.add(band);
+          const light = new THREE.PointLight(0x46dafa, 0.7, 11); light.position.y = 2.3; g.add(light);
+          g.userData.isRecycler = true; builtPurifiers.push({ x: x, z: z }); toast("Water recycler built · interact beside it");
+        }
+      }
+      document.getElementById("build-panel").classList.remove("show");
+      document.getElementById("build-panel").setAttribute("aria-hidden", "true");
+      document.getElementById("btn-build").setAttribute("aria-expanded", "false");
+      updateObjective();
+    }
+    document.getElementById("btn-jump").addEventListener("click", function () { jumpTime = 0.55; });
+    document.getElementById("btn-build").addEventListener("click", function () {
+      const panel = document.getElementById("build-panel");
+      const open = !panel.classList.contains("show");
+      panel.classList.toggle("show", open);
+      panel.setAttribute("aria-hidden", open ? "false" : "true");
+      this.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.getElementById("fab-close").addEventListener("click", function () {
+      document.getElementById("build-panel").classList.remove("show");
+      document.getElementById("build-panel").setAttribute("aria-hidden", "true");
+      document.getElementById("btn-build").setAttribute("aria-expanded", "false");
+    });
+    document.querySelectorAll(".fab-option").forEach(function (button) {
+      button.addEventListener("click", function () { buildTech(button.dataset.build); });
+    });
+    document.getElementById("btn-use").addEventListener("click", function (event) {
+      if (techInteract()) { event.stopImmediatePropagation(); event.preventDefault(); }
+    }, true);
+    document.getElementById("btn-act").addEventListener("click", function (event) {
+      if (activeTool === "seeds" && plantOrHarvest()) { event.stopImmediatePropagation(); event.preventDefault(); }
+    }, true);
+    const techKeys = Object.create(null);
+    window.addEventListener("keydown", function (event) {
+      techKeys[event.code] = true;
+      if (event.code === "KeyE") document.getElementById("btn-use").click();
+      if (event.code === "KeyF") document.getElementById("btn-act").click();
+      if (event.code === "KeyB") document.getElementById("btn-build").click();
+      if (event.code === "Space") jumpTime = 0.55;
+    });
+    window.addEventListener("keyup", function (event) { techKeys[event.code] = false; });
+    canvas.addEventListener("click", function () {
+      if (!matchMedia("(pointer: coarse)").matches && document.pointerLockElement !== canvas && canvas.requestPointerLock) canvas.requestPointerLock();
+    });
+    document.addEventListener("mousemove", function (event) {
+      if (document.pointerLockElement === canvas) {
+        player.yaw -= event.movementX * 0.0028;
+        player.pitch = Math.max(-1.15, Math.min(1.15, player.pitch - event.movementY * 0.0022));
+      }
+    });
+    function updateTechWorld(dt) {
+      techClock += dt;
+      for (const bed of techBeds) if (bed.status === "growing") {
+        const growth = Math.min(1, (techClock - bed.plantedAt) / 34);
+        bed.crop.scale.setScalar(0.22 + growth * 0.78);
+        if (growth >= 1) bed.status = "ready";
+      }
+      if (Math.random() < 0.035) mastLamp.material.emissiveIntensity = 0.7 + Math.random() * 0.9;
+      if ((techKeys.KeyW || techKeys.ArrowUp) && !document.getElementById("build-panel").classList.contains("show")) {
+        player.x -= Math.sin(player.yaw) * 4.2 * dt; player.z -= Math.cos(player.yaw) * 4.2 * dt;
+      }
+      if ((techKeys.KeyS || techKeys.ArrowDown) && !document.getElementById("build-panel").classList.contains("show")) {
+        player.x += Math.sin(player.yaw) * 4.2 * dt; player.z += Math.cos(player.yaw) * 4.2 * dt;
+      }
+      if ((techKeys.KeyA || techKeys.ArrowLeft) && !document.getElementById("build-panel").classList.contains("show")) {
+        player.x -= Math.cos(player.yaw) * 4.2 * dt; player.z += Math.sin(player.yaw) * 4.2 * dt;
+      }
+      if ((techKeys.KeyD || techKeys.ArrowRight) && !document.getElementById("build-panel").classList.contains("show")) {
+        player.x += Math.cos(player.yaw) * 4.2 * dt; player.z -= Math.sin(player.yaw) * 4.2 * dt;
+      }
+    }
+    // Game Loop
+    let lastTime = performance.now();
+    function tick() {
+      requestAnimationFrame(tick);
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) * 0.001, 0.05);
+      lastTime = now;
+
+      updateTechWorld(dt);
+      // Joystick Movement
+      if (Math.abs(joyMove.x) > 0.05 || Math.abs(joyMove.y) > 0.05) {
+        const fwd = new THREE.Vector3(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
+        const right = new THREE.Vector3(Math.cos(player.yaw), 0, -Math.sin(player.yaw));
+        const moveVec = fwd.multiplyScalar(-joyMove.y).add(right.multiplyScalar(joyMove.x));
+        const speed = 4.8;
+        player.x += moveVec.x * speed * dt;
+        player.z += moveVec.z * speed * dt;
+      }
+
+      player.y = getTerrainY(player.x, player.z) + 1.65;
+      camera.position.set(player.x, player.y, player.z);
+      if (jumpTime > 0) camera.position.y += Math.sin((0.55 - jumpTime) / 0.55 * Math.PI) * 1.35;
+      camera.rotation.set(player.pitch, player.yaw, 0, "YXZ");
+
+      // Vitals Decay
+      player.food = Math.max(0, player.food - 0.02 * dt);
+      player.water = Math.max(0, player.water - 0.04 * dt);
+      document.getElementById("bar-hp").style.width = player.hp + "%";
+      document.getElementById("bar-food").style.width = player.food + "%";
+      document.getElementById("bar-water").style.width = player.water + "%";
+
+      renderer.render(scene, camera);
+    }
+    tick();
+  </script>
 </body>
 </html>
